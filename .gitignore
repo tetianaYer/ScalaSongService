@@ -1,0 +1,44 @@
+target/
+lib_managed/
+src_managed/
+project/boot/
+project/plugins/project/
+project/target/
+project/project/target/
+
+*.class
+*.log
+.metadata
+bin/
+tmp/
+*.tmp
+*.bak
+*.swp
+*~.nib
+.settings/
+
+.bsp/
+.metals/
+.bloop/
+.vscode/
+
+# JetBrains
+*.iml
+.idea/
+.idea_modules/
+out/
+*.iws
+*.ipr
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Package Files #
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
