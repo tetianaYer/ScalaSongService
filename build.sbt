@@ -18,7 +18,7 @@ lazy val root = (project in file("."))
     libraryDependencies ++= Seq(
       "org.http4s" %% "http4s-circe" % Http4sVersion,
       "org.http4s" %% "http4s-dsl" % Http4sVersion,
-      "org.http4s" %% "http4s-jetty-server" % "0.23.12",
+      "org.http4s" %% "http4s-jetty-server" % "0.23.13",
       "com.softwaremill.sttp.client4" %% "core" % Sttp4Version,
       "com.softwaremill.sttp.client4" %% "circe" % Sttp4Version,
       "com.softwaremill.sttp.client4" %% "async-http-client-backend" % Sttp4Version,

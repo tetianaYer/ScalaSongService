@@ -1,6 +1,6 @@
 package com.clearscore.apitemplate
 
-import cats.effect._
+import cats.effect.*
 import com.clearscore.apitemplate.http.Routes
 import org.http4s._
 import org.http4s.implicits._
@@ -19,12 +19,12 @@ object Main extends IOApp:
       "/" -> routes.testRoute1,
       "/" -> routes.testRoute2
     )
-    buildServer(apis)
+    buildServer(apis)as(ExitCode.Success)
 
   private def buildServer(app: HttpRoutes[IO]) =
     JettyBuilder[IO]
       .bindHttp(8081, "localhost")
       .mountHttpApp(app.orNotFound, "/")
-      .resource
-      .use(_ => IO.never)
-      .as(ExitCode.Success)
+      .serve
+      .compile
+      .drain
