@@ -7,7 +7,7 @@ import org.http4s.circe.CirceEntityEncoder._
 import org.http4s.dsl.Http4sDsl
 import org.typelevel.vault.Vault
 
-class Routes[F[_]: Concurrent] extends Http4sDsl[F]:
+class Routes[F[_]: Concurrent] extends Http4sDsl[F] {
 
   val testRoute1: HttpRoutes[F] =
     HttpRoutes.of[F] { case req @ POST -> Root / "test" =>
@@ -30,3 +30,4 @@ class Routes[F[_]: Concurrent] extends Http4sDsl[F]:
           ).pure
       }
   }
+}
