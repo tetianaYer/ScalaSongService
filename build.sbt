@@ -36,5 +36,8 @@ lazy val root = (project in file("."))
       "com.github.pureconfig" %% "pureconfig-cats-effect" % "0.17.4",
       "com.github.pureconfig" %% "pureconfig-core" % "0.17.4",
       "ch.qos.logback" % "logback-classic" % LogbackVersion % Runtime
-    )
+    ),
+    scalacOptions ++= Seq(
+      "-no-indent",
+    ),
   )
