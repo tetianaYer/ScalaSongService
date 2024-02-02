@@ -25,10 +25,5 @@ class GetStartedRoutes[F[_]: Sync](getStartedService: GetStartedService[F])
       case req @ POST -> Root / "team-member" / teamMember => {
         Created(getStartedService.addTeamMember(teamMember))
       }
-
-      case req @ DELETE -> Root / "team-member" / teamMemberId => {
-        getStartedService.removeTeamMember(teamMemberId).flatMap(_ => NoContent())
-        // NoContent() / NotFound()
-      }
     }
 }

@@ -7,7 +7,6 @@ import com.clearscore.apitemplate.model.TeamMember
 trait StarterRepository[F[_]] {
   def getTeamMembers(): F[List[TeamMember]]
   def addTeamMember(teamMemberName: String): F[TeamMember]
-  def removeTeamMember(teamMember: Int): F[Unit]
 }
 
 class StarterRepositoryImpl[F[_]: Sync] extends StarterRepository[F] {
@@ -21,9 +20,5 @@ class StarterRepositoryImpl[F[_]: Sync] extends StarterRepository[F] {
       newTeamMember = TeamMember(id, teamMemberName)
       _ <- Sync[F].delay(StarterFakeDB.addNewTeamMember(newTeamMember).toList)
     } yield newTeamMember
-  }
-
-  override def removeTeamMember(teamMemberId: Int): F[Unit] = {
-    Sync[F].delay(StarterFakeDB.removeTeamMember(teamMemberId)).void
   }
 }

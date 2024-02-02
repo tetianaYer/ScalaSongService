@@ -11,7 +11,6 @@ import scala.util.{Failure, Success, Try}
 trait GetStartedService[F[_]] {
   def getProjectInformation(): F[Option[ProjectInformation]]
   def addTeamMember(teamMember: String): F[TeamMember]
-  def removeTeamMember(teamMemberId: String): F[Unit]
 }
 
 class GetStartedServiceImpl[F[_]: Sync](
@@ -31,12 +30,5 @@ class GetStartedServiceImpl[F[_]: Sync](
 
   override def addTeamMember(teamMember: String): F[TeamMember] = {
     startRepository.addTeamMember(teamMember)
-  }
-
-  override def removeTeamMember(teamMemberId: String): F[Unit] = {
-    Try(teamMemberId.toInt) match {
-      case Failure(_)  => Sync[F].delay(())
-      case Success(id) => startRepository.removeTeamMember(id)
-    }
   }
 }
