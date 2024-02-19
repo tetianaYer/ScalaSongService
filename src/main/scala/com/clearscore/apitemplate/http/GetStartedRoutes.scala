@@ -11,6 +11,7 @@ class GetStartedRoutes(getStartedService: GetStartedService)
     extends Http4sDsl[IO] {
   val routes: HttpRoutes[IO] =
     HttpRoutes.of[IO] {
+      case GET -> Root => Ok("What are you actually looking for?")
       case GET -> Root / "project-information" => {
         for {
           maybeProjectInformation <- getStartedService.getProjectInformation()
@@ -21,6 +22,7 @@ class GetStartedRoutes(getStartedService: GetStartedService)
           }
         } yield response
       }
+
 
       case req @ POST -> Root / "team-member" / teamMember => {
         Created(getStartedService.addTeamMember(teamMember))
