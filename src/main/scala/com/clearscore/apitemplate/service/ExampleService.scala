@@ -1,7 +1,6 @@
 package com.clearscore.apitemplate.service
 
 import cats.effect.IO
-import cats.implicits.*
 import com.clearscore.apitemplate.db.ExampleDB.Example
 import com.clearscore.apitemplate.db.ExampleRepository
 

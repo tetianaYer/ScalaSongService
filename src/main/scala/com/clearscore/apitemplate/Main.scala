@@ -1,9 +1,12 @@
 package com.clearscore.apitemplate
 
 import cats.effect.*
-import com.clearscore.apitemplate.db.ExampleRepositoryImpl
-import com.clearscore.apitemplate.http.{ExampleRoutes, Routes}
-import com.clearscore.apitemplate.service.{ExampleService, ExampleServiceImpl}
+import com.clearscore.apitemplate.db.{ExampleRepositoryImpl, StarterRepository}
+import com.clearscore.apitemplate.http.{ExampleRoutes, GetStartedRoutes}
+import com.clearscore.apitemplate.service.{
+  ExampleServiceImpl,
+  GetStartedServiceImpl
+}
 import org.http4s.*
 import org.http4s.implicits.*
 import org.http4s.jetty.server.JettyBuilder
@@ -13,7 +16,11 @@ object Main extends IOApp {
 
   IO.println("Server Starting")
 
-  private val routes: Routes[IO] = new Routes[IO]
+  private val starterRepository = StarterRepository()
+  private val getStartedService =
+    new GetStartedServiceImpl(starterRepository)
+  private val getStartedRoutes: GetStartedRoutes =
+    new GetStartedRoutes(getStartedService)
 
   private val exampleRepository = new ExampleRepositoryImpl
   private val exampleService = new ExampleServiceImpl(exampleRepository)
@@ -22,12 +29,11 @@ object Main extends IOApp {
   override def run(args: List[String]): IO[ExitCode] = {
 
     val apis = Router(
-      "/" -> routes.testRoute1,
-      "/" -> routes.testRoute2,
+      "/" -> getStartedRoutes.routes,
       "/example" -> exampleRoutes.routes
     )
 
-    buildServer(apis)as(ExitCode.Success)
+    buildServer(apis) as (ExitCode.Success)
   }
 
   private def buildServer(app: HttpRoutes[IO]) =

@@ -3,9 +3,6 @@ package com.clearscore.apitemplate.db
 import cats.effect.IO
 import cats.implicits.*
 import com.clearscore.apitemplate.db.ExampleDB.Example
-import cats.implicits.catsSyntaxApplicativeId
-import cats.syntax.all.catsSyntaxApplicativeId
-import cats.syntax.applicative.catsSyntaxApplicativeId
 import io.circe.{Encoder, Json}
 import org.http4s.EntityEncoder
 import org.http4s.circe.jsonEncoderOf
@@ -38,5 +35,4 @@ class ExampleRepositoryImpl extends ExampleRepository {
   def getExampleById(id: Int): IO[Option[Example]] = {
     ExampleDB.db.find(_.id == id).pure[IO]
   }
-
 }
