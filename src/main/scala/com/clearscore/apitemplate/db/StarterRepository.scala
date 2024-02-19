@@ -1,27 +1,25 @@
 package com.clearscore.apitemplate.db
 
-import cats.effect.Sync
-import cats.syntax.all.*
+import cats.effect.IO
 import com.clearscore.apitemplate.model.TeamMember
 
-trait StarterRepository[F[*]] {
-  def getTeamMembers(): F[List[TeamMember]]
-  def addTeamMember(teamMemberName: String): F[TeamMember]
+trait StarterRepository {
+  def getTeamMembers(): IO[List[TeamMember]]
+  def addTeamMember(teamMemberName: String): IO[TeamMember]
 }
 
 object StarterRepository {
-  def apply[F[*]: Sync](): StarterRepository[F] = new StarterRepositoryImpl[F]()
-  private class StarterRepositoryImpl[F[*]: Sync]()
-      extends StarterRepository[F] {
-    override def getTeamMembers(): F[List[TeamMember]] =
-      Sync[F].delay(StarterFakeDB.teamMembersTable.toList)
+  def apply(): StarterRepository = new StarterRepositoryImpl()
+  private class StarterRepositoryImpl() extends StarterRepository {
+    override def getTeamMembers(): IO[List[TeamMember]] =
+      IO(StarterFakeDB.teamMembersTable.toList)
 
-    override def addTeamMember(teamMemberName: String): F[TeamMember] = {
+    override def addTeamMember(teamMemberName: String): IO[TeamMember] = {
       for {
-        currentTeamMembers <- Sync[F].delay(StarterFakeDB.teamMembersTable)
+        currentTeamMembers <- IO(StarterFakeDB.teamMembersTable)
         id = currentTeamMembers.length
         newTeamMember = TeamMember(id, teamMemberName)
-        _ <- Sync[F].delay(StarterFakeDB.addNewTeamMember(newTeamMember).toList)
+        _ <- IO(StarterFakeDB.addNewTeamMember(newTeamMember).toList)
       } yield newTeamMember
     }
   }

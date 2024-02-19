@@ -11,17 +11,16 @@ import org.http4s.*
 import org.http4s.implicits.*
 import org.http4s.jetty.server.JettyBuilder
 import org.http4s.server.Router
-import cats.effect.Sync
 
 object Main extends IOApp {
 
   IO.println("Server Starting")
 
-  private val starterRepository = StarterRepository[IO]()
+  private val starterRepository = StarterRepository()
   private val getStartedService =
-    new GetStartedServiceImpl[IO](starterRepository)
-  private val getStartedRoutes: GetStartedRoutes[IO] =
-    new GetStartedRoutes[IO](getStartedService)
+    new GetStartedServiceImpl(starterRepository)
+  private val getStartedRoutes: GetStartedRoutes =
+    new GetStartedRoutes(getStartedService)
 
   private val exampleRepository = new ExampleRepositoryImpl
   private val exampleService = new ExampleServiceImpl(exampleRepository)
