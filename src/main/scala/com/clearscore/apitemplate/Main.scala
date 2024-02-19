@@ -1,19 +1,23 @@
 package com.clearscore.apitemplate
 
 import cats.effect.*
-import com.clearscore.apitemplate.db.{ExampleRepositoryImpl, StarterRepositoryImpl}
+import com.clearscore.apitemplate.db.{ExampleRepositoryImpl, StarterRepository}
 import com.clearscore.apitemplate.http.{ExampleRoutes, GetStartedRoutes}
-import com.clearscore.apitemplate.service.{ExampleServiceImpl, GetStartedServiceImpl}
+import com.clearscore.apitemplate.service.{
+  ExampleServiceImpl,
+  GetStartedServiceImpl
+}
 import org.http4s.*
 import org.http4s.implicits.*
 import org.http4s.jetty.server.JettyBuilder
 import org.http4s.server.Router
+import cats.effect.Sync
 
 object Main extends IOApp {
 
   IO.println("Server Starting")
 
-  private val starterRepository = new StarterRepositoryImpl[IO]
+  private val starterRepository = StarterRepository[IO]()
   private val getStartedService =
     new GetStartedServiceImpl[IO](starterRepository)
   private val getStartedRoutes: GetStartedRoutes[IO] =
