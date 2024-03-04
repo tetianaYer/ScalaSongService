@@ -2,8 +2,8 @@ ThisBuild / version := "0.1.0-SNAPSHOT"
 
 ThisBuild / scalaVersion := "3.3.1"
 
-val Http4sVersion = "0.23.23"
-val CirceVersion = "0.14.5"
+val Http4sVersion = "0.23.25"
+val CirceVersion = "0.14.6"
 val LogbackVersion = "1.4.14"
 val Sttp4Version = "4.0.0-M8"
 

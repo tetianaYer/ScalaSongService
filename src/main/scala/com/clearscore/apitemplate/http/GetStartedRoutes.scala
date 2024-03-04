@@ -1,10 +1,13 @@
 package com.clearscore.apitemplate.http
 
 import cats.effect.IO
-import cats.implicits.*
+import com.clearscore.apitemplate.model.BasicsUserModel
 import com.clearscore.apitemplate.service.GetStartedService
 import org.http4s.*
-import org.http4s.circe.CirceEntityEncoder.*
+import org.http4s.circe.CirceEntityCodec.{
+  circeEntityDecoder,
+  circeEntityEncoder
+}
 import org.http4s.dsl.Http4sDsl
 
 class GetStartedRoutes(getStartedService: GetStartedService)
@@ -22,10 +25,25 @@ class GetStartedRoutes(getStartedService: GetStartedService)
           }
         } yield response
       }
-
-
       case req @ POST -> Root / "team-member" / teamMember => {
         Created(getStartedService.addTeamMember(teamMember))
       }
     }
+
+  def teamMemberRoutes(): HttpRoutes[IO] = {
+    HttpRoutes.of[IO] {
+      case req @ POST -> Root / "user" => {
+        for {
+          decodedRequest <- req.as[BasicsUserModel]
+          response <- Ok(s"You sent, $decodedRequest.")
+        } yield response
+      }
+      //      case  DELETE -> Root / "user" / userName => {
+      //        for {
+      //          decodedDeleteRequest <-
+      //            response <- Ok(s"deleted user: $user ")
+      //        } yield response
+      //      }
+    }
+  }
 }

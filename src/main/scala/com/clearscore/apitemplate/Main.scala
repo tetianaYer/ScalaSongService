@@ -1,16 +1,20 @@
 package com.clearscore.apitemplate
 
+import cats.data.Kleisli
 import cats.effect.*
+import cats.implicits.*
 import com.clearscore.apitemplate.db.{ExampleRepositoryImpl, StarterRepository}
 import com.clearscore.apitemplate.http.{ExampleRoutes, GetStartedRoutes}
 import com.clearscore.apitemplate.service.{
   ExampleServiceImpl,
   GetStartedServiceImpl
 }
+import com.comcast.ip4s.*
 import org.http4s.*
 import org.http4s.implicits.*
 import org.http4s.jetty.server.JettyBuilder
 import org.http4s.server.Router
+import org.http4s.server.middleware.Logger
 
 object Main extends IOApp {
 
@@ -29,10 +33,9 @@ object Main extends IOApp {
   override def run(args: List[String]): IO[ExitCode] = {
 
     val apis = Router(
-      "/" -> getStartedRoutes.routes,
+      "/" -> (getStartedRoutes.routes <+> getStartedRoutes.teamMemberRoutes()),
       "/example" -> exampleRoutes.routes
     )
-
     buildServer(apis) as (ExitCode.Success)
   }
 
