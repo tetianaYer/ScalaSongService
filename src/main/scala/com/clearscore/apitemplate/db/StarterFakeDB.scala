@@ -10,4 +10,9 @@ object StarterFakeDB {
 
   def addNewTeamMember(teamMember: TeamMember): ListBuffer[TeamMember] =
     teamMembersTable += teamMember
+
+  def deleteTeamMember(teamMember: TeamMember): ListBuffer[TeamMember] =
+    teamMembersTable -= teamMember
+
+
 }

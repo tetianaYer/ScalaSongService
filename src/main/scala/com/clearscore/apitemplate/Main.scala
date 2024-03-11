@@ -2,22 +2,22 @@ package com.clearscore.apitemplate
 
 import cats.data.Kleisli
 import cats.effect.*
-import cats.implicits.*
+import cats.syntax.all.*
 import com.clearscore.apitemplate.db.{ExampleRepositoryImpl, StarterRepository}
 import com.clearscore.apitemplate.http.{ExampleRoutes, GetStartedRoutes}
-import com.clearscore.apitemplate.service.{
-  ExampleServiceImpl,
-  GetStartedServiceImpl
-}
-import com.comcast.ip4s.*
+import com.clearscore.apitemplate.model.{BasicsUserModel, Song}
+import com.clearscore.apitemplate.service.{ExampleServiceImpl, GetStartedServiceImpl}
 import org.http4s.*
 import org.http4s.implicits.*
 import org.http4s.jetty.server.JettyBuilder
 import org.http4s.server.Router
-import org.http4s.server.middleware.Logger
 
 object Main extends IOApp {
-
+  val userDefault = BasicsUserModel(
+    userName = "Obama",
+    age = Some(59),
+    favouriteSong = Song(3.22, "Hey Jude", "The Beatles")
+  )
   IO.println("Server Starting")
 
   private val starterRepository = StarterRepository()
