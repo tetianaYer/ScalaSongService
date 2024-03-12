@@ -11,6 +11,7 @@ import scala.util.{Failure, Success, Try}
 trait GetStartedService {
   def getProjectInformation(): IO[Option[ProjectInformation]]
   def addTeamMember(teamMember: String): IO[TeamMember]
+  def deleteTeamMember(teamMember: String): IO[Option[TeamMember]]
 }
 
 class GetStartedServiceImpl(
@@ -30,5 +31,9 @@ class GetStartedServiceImpl(
 
   override def addTeamMember(teamMember: String): IO[TeamMember] = {
     startRepository.addTeamMember(teamMember)
+  }
+
+  override def deleteTeamMember(teamMember: String): IO[Option[TeamMember]] = {
+    startRepository.deleteTeamMember(teamMember)
   }
 }

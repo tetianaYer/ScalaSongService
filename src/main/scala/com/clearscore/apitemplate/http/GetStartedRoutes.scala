@@ -38,12 +38,19 @@ class GetStartedRoutes(getStartedService: GetStartedService)
           response <- Ok(s"You sent, $decodedRequest.")
         } yield response
       }
-      //      case  DELETE -> Root / "user" / userName => {
-      //        for {
-      //          decodedDeleteRequest <-
-      //            response <- Ok(s"deleted user: $user ")
-      //        } yield response
-      //      }
+      case DELETE -> Root / "team-member" / teamMember => {
+        for {
+          _ <- IO.println(s"deleting user: $teamMember")
+          deletedUser <- getStartedService.deleteTeamMember(teamMember)
+          response <- deletedUser match {
+            case Some(deletedUser) => Ok(deletedUser)
+            case None =>
+              NotFound("uh oh, no team mates are working on this project")
+          }
+//            response <-  Ok(getStartedService.deleteTeamMember(teamMember))
+//          Ok(s"deleted user: $teamMember")
+        } yield response
+      }
     }
   }
 }
