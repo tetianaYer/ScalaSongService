@@ -3,10 +3,11 @@ package com.clearscore.apitemplate
 import cats.data.Kleisli
 import cats.effect.*
 import cats.syntax.all.*
-import com.clearscore.apitemplate.db.{ExampleRepositoryImpl, StarterRepository}
-import com.clearscore.apitemplate.http.{ExampleRoutes, GetStartedRoutes}
+import com.clearscore.apitemplate.db.{ExampleRepositoryImpl, SongRepositoryImpl, StarterRepository}
+import com.clearscore.apitemplate.http.SongDatabaseRoutes
 import com.clearscore.apitemplate.model.{BasicsUserModel, Song}
-import com.clearscore.apitemplate.service.{ExampleServiceImpl, GetStartedServiceImpl}
+import com.clearscore.apitemplate.service.{SongDatabaseService, SongDatabaseServiceImpl}
+import com.clearscore.apitemplate.utils.SongDB
 import org.http4s.*
 import org.http4s.implicits.*
 import org.http4s.jetty.server.JettyBuilder
@@ -16,25 +17,19 @@ object Main extends IOApp {
   val userDefault = BasicsUserModel(
     userName = "Obama",
     age = Some(59),
-    favouriteSong = Song(3.22, "Hey Jude", "The Beatles")
+    favouriteSong = Song(3.22, "Hey Jude", "The Beatles").some
   )
   IO.println("Server Starting")
 
-  private val starterRepository = StarterRepository()
-  private val getStartedService =
-    new GetStartedServiceImpl(starterRepository)
-  private val getStartedRoutes: GetStartedRoutes =
-    new GetStartedRoutes(getStartedService)
 
-  private val exampleRepository = new ExampleRepositoryImpl
-  private val exampleService = new ExampleServiceImpl(exampleRepository)
-  private val exampleRoutes = new ExampleRoutes(exampleService)
-
+  private val songRepository = new SongRepositoryImpl(new SongDB())
+  private val songDatabaseService = new SongDatabaseServiceImpl(songRepository)
+  private val songDatabaseRoutes = new SongDatabaseRoutes(songDatabaseService)
+  
   override def run(args: List[String]): IO[ExitCode] = {
 
     val apis = Router(
-      "/" -> (getStartedRoutes.routes <+> getStartedRoutes.teamMemberRoutes()),
-      "/example" -> exampleRoutes.routes
+      "/v1" -> songDatabaseRoutes.routes
     )
     buildServer(apis) as (ExitCode.Success)
   }
