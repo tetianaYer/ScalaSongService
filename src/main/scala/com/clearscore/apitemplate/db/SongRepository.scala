@@ -1,7 +1,7 @@
 package com.clearscore.apitemplate.db
 
 import cats.effect.IO
-import com.clearscore.apitemplate.model.{Song, TeamMember}
+import com.clearscore.apitemplate.model.{Song, User}
 import com.clearscore.apitemplate.utils.SongDB
 
 trait SongRepository {
@@ -11,37 +11,37 @@ trait SongRepository {
 
 class SongRepositoryImpl(songDB: SongDB) extends SongRepository {
   // team member logic (deprecated) (Please rename to user and use for User routes!)
-//    override def getTeamMembers(): IO[List[TeamMember]] =
-//      IO(StarterFakeDB.teamMembersTable.toList)
+//    override def getUsers(): IO[List[User]] =
+//      IO(StarterFakeDB.UsersTable.toList)
 //
-//    override def addTeamMember(teamMemberName: String): IO[TeamMember] = {
+//    override def addUser(UserName: String): IO[User] = {
 //      for {
-//        currentTeamMembers <- IO(StarterFakeDB.teamMembersTable)
-//        id = currentTeamMembers.length
-//        newTeamMember = TeamMember(id, teamMemberName)
-//        _ <- IO(StarterFakeDB.addNewTeamMember(newTeamMember).toList)
-//      } yield newTeamMember
+//        currentUsers <- IO(StarterFakeDB.UsersTable)
+//        id = currentUsers.length
+//        newUser = User(id, UserName)
+//        _ <- IO(StarterFakeDB.addNewUser(newUser).toList)
+//      } yield newUser
 //    }
-//    override def deleteTeamMember(
-//        teamMemberName: String
-//    ): IO[Option[TeamMember]] = {
+//    override def deleteUser(
+//        UserName: String
+//    ): IO[Option[User]] = {
 //      for {
-//        _ <- IO.println("Initiated deleting of user in db: " + teamMemberName)
-//        index = StarterFakeDB.teamMembersTable.indexWhere(
-//          _.name == teamMemberName
+//        _ <- IO.println("Initiated deleting of user in db: " + UserName)
+//        index = StarterFakeDB.UsersTable.indexWhere(
+//          _.name == UserName
 //        )
-//        deletedTeamMember <- IO(
+//        deletedUser <- IO(
 //          if index == -1 then None
 //          else {
-//            val deleted: TeamMember = StarterFakeDB.teamMembersTable.remove(index)
+//            val deleted: User = StarterFakeDB.UsersTable.remove(index)
 //            Some(deleted)
 //          }
 //        )
-//        _ <- IO.println("Deleted user in db: " + deletedTeamMember)
+//        _ <- IO.println("Deleted user in db: " + deletedUser)
 //        _ <- IO.println("Index: " + index)
-//        _ <- IO.println(StarterFakeDB.teamMembersTable.toList)
+//        _ <- IO.println(StarterFakeDB.UsersTable.toList)
 //
-//      } yield deletedTeamMember
+//      } yield deletedUser
 //    }
 
   // Wrapping the entire operation in an IO monad to simulate a database connection :)
