@@ -3,8 +3,8 @@ package com.clearscore.apitemplate.service
 import cats.effect.kernel.Sync
 import cats.effect.{IO, Sync}
 import cats.implicits.*
-import com.clearscore.apitemplate.db.{SongRepository, StarterRepository}
-import com.clearscore.apitemplate.model.{ProjectInformation, Song, TeamMember}
+import com.clearscore.apitemplate.db.{SongRepository, UserRepository}
+import com.clearscore.apitemplate.model.{ProjectInformation, Song, User}
 import com.clearscore.apitemplate.utils.SongDB
 
 import scala.util.{Failure, Success, Try}
