@@ -1,12 +1,15 @@
 package com.clearscore.apitemplate.db
 
 import cats.effect.IO
-import com.clearscore.apitemplate.model.User
+import com.clearscore.apitemplate.model.{User, UserRequest}
+
+import java.util.UUID
 
 trait UserRepository {
   def getUsers(): IO[List[User]]
-  def addUser(user: User): IO[User]
+  def addUser(user: UserRequest): IO[User]
   def deleteUser(UserName: String): IO[Option[User]]
+  def addFaveSong(userUuid: String, songUuid: String): IO[Unit]
 }
 
 object UserRepository {
@@ -15,11 +18,11 @@ object UserRepository {
     override def getUsers(): IO[List[User]] =
       IO(StarterFakeDB.usersTable.toList)
 
-    override def addUser(user: User): IO[User] = {
+    override def addUser(user: UserRequest): IO[User] = {
       for {
         currentUsers <- IO(StarterFakeDB.usersTable)
-        id = currentUsers.length
-        newUser = User(id, user.userName, user.age, user.favouriteSong)
+        uuid = UUID.randomUUID()
+        newUser = User(uuid, user.userName, user.age, user.favouriteSong)
         _ <- IO(StarterFakeDB.addNewUser(newUser).toList)
       } yield newUser
     }
@@ -44,6 +47,8 @@ object UserRepository {
 
       } yield deletedUser
     }
+    override def addFaveSong(userUuid: String, songUuid: String): IO[Unit] = IO {}
+
   }
 
 }

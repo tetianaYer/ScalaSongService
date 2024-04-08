@@ -1,7 +1,7 @@
 package com.clearscore.apitemplate.http
 
 import cats.effect.IO
-import com.clearscore.apitemplate.model.User
+import com.clearscore.apitemplate.model.UserRequest
 import com.clearscore.apitemplate.service.UserService
 import org.http4s.*
 import org.http4s.circe.CirceEntityCodec.{
@@ -26,7 +26,7 @@ class UserRoutes(userService: UserService) extends Http4sDsl[IO] {
 //      }
       case req @ POST -> Root / "user" => {
         for {
-          decodedRequest <- req.as[User]
+          decodedRequest <- req.as[UserRequest]
           response <- Created(userService.addUser(decodedRequest))
         } yield response
       }
