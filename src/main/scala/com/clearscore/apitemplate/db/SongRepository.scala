@@ -31,7 +31,7 @@ class SongRepositoryImpl extends SongRepository {
     for {
       _ <- IO.println("Initiated deleting of song in db: " + songUUID)
       index = StarterFakeDB.songsTable.indexWhere(
-        _.uuid == songUUID
+        _.songUuid == songUUID
       )
       deletedSong <- IO(
         if index == -1 then throw new DeletionException("Not found!!!!!")

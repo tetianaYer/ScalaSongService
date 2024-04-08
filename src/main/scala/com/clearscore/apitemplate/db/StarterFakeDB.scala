@@ -1,6 +1,7 @@
 package com.clearscore.apitemplate.db
 
-import com.clearscore.apitemplate.model.{Song, User}
+import com.clearscore.apitemplate.model.*
+import java.util.UUID
 
 import scala.collection.mutable.ListBuffer
 
@@ -15,8 +16,8 @@ object StarterFakeDB {
   def deleteUser(user: User): ListBuffer[User] =
     usersTable -= user
 
-
   def addNewSong(song: Song): ListBuffer[Song] =
     songsTable += song
+
 
 }

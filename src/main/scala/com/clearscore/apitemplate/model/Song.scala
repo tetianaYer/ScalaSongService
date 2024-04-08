@@ -4,7 +4,7 @@ import io.circe.Codec
 
 import java.util.UUID
 
-case class Song(uuid: UUID, length: Double, title: String, artist: String)
+case class Song(songUuid: UUID, length: Double, title: String, artist: String)
     derives Codec.AsObject
 
 case class SongRequest(

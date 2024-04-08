@@ -23,8 +23,8 @@ class SongDatabaseRoutes(
       case req @ POST -> Root / "songs" => {
         for {
           decodedRequest <- req.as[SongRequest]
-          _ <- songDatabaseService.addSong(decodedRequest)
-          response <- Ok(s"The song: ${decodedRequest.title} is added")
+          song <- songDatabaseService.addSong(decodedRequest)
+          response <- Ok(song)
         } yield response
       }
       case req @ DELETE -> Root / "songs" / songUUID => {
@@ -37,22 +37,6 @@ class SongDatabaseRoutes(
           songs <- songDatabaseService.getAllSongs()
           response <- Ok(songs)
         } yield response
-      }
-      // TODO: 7  Add user's fav song
-//      case POST -> Root / "users" / userUuid /  "favourite-songs" / songUuid => {
-//        for {
-//          _ <- userService.addFaveSong(userUuid, songUuid)
-//          response <- Ok(s"The song: ${decodedRequest.title} is now your favourite song!")
-//        } yield response
-//        Ok()
-//      }
-      // TODO: 8 Get a user's fav song
-      case GET -> Root / "users" / userUuid / "favourite-songs" => {
-//        for {
-//          decodedRequest <- cheese
-//          response <- cheese
-//        } yield cheese
-        Ok()
       }
     }
   }
