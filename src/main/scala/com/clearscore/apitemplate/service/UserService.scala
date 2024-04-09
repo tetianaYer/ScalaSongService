@@ -1,40 +1,39 @@
 package com.clearscore.apitemplate.service
 
-import cats.effect.kernel.Sync
-import cats.effect.{IO, Sync}
-import cats.implicits.*
+import cats.effect.IO
 import com.clearscore.apitemplate.db.UserRepository
-import com.clearscore.apitemplate.model.{ProjectInformation, User}
+import com.clearscore.apitemplate.model.{User, UserRequest}
 
-import scala.util.{Failure, Success, Try}
+import java.util.UUID
 
 trait UserService {
 //  def getProjectInformation(): IO[Option[ProjectInformation]]
-  def addUser(user: User): IO[User]
+  def addUser(user: UserRequest): IO[User]
+
+  def getUsers(): IO[List[User]]
   def deleteUser(user: String): IO[Option[User]]
-  // TODO: USER ID NOT USER NAME ^
+  def addFaveSong(userUuid: UUID, songUuid: UUID): IO[Unit]
+}
+
+object UserService {
+  def apply(userRepository: UserRepository) = new UserServiceImpl(userRepository: UserRepository)
 }
 
 class UserServiceImpl(
                        userRepository: UserRepository
 ) extends UserService {
-  private val PROJECT_NAME = "New Project"
 
-//  override def getProjectInformation(): IO[Option[ProjectInformation]] = {
-//    userRepository.getUsers().map { Users =>
-//      if (Users.isEmpty) {
-//        None
-//      } else {
-//        Some(ProjectInformation(PROJECT_NAME, Users))
-//      }
-//    }
-//  }
-
-  override def addUser(user: User): IO[User] = {
+  override def getUsers(): IO[List[User]] = userRepository.getUsers()
+  override def addUser(user: UserRequest): IO[User] = {
     userRepository.addUser(user)
+
   }
 
   override def deleteUser(user: String): IO[Option[User]] = {
     userRepository.deleteUser(user)
+  }
+
+  override def addFaveSong(userUuid: UUID, songUuid: UUID): IO[Unit] = {
+    userRepository.addFaveSong(userUuid, songUuid)
   }
 }

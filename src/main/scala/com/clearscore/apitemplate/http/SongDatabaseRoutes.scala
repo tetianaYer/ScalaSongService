@@ -1,12 +1,13 @@
 package com.clearscore.apitemplate.http
 
 import cats.effect.IO
-import com.clearscore.apitemplate.model.User
-import com.clearscore.apitemplate.model.Song
-import com.clearscore.apitemplate.service.{UserService, SongDatabaseService}
+import com.clearscore.apitemplate.model.SongRequest
+import com.clearscore.apitemplate.service.{SongDatabaseService, UserService}
 import org.http4s.*
 import org.http4s.circe.CirceEntityCodec.{circeEntityDecoder, circeEntityEncoder}
 import org.http4s.dsl.Http4sDsl
+
+import java.util.UUID
 /*
  TODO:
    6. Update songs
@@ -14,37 +15,28 @@ import org.http4s.dsl.Http4sDsl
 
 class SongDatabaseRoutes(
     songDatabaseService: SongDatabaseService,
-//    getStartedService: UserService
+    userService: UserService
 ) extends Http4sDsl[IO] {
   def routes: HttpRoutes[IO] = {
     HttpRoutes.of[IO] {
       // Add a song
-      case req @ POST -> Root / "song" => {
+      case req @ POST -> Root / "songs" => {
         for {
-          decodedRequest <- req.as[Song]
-          _ <- songDatabaseService.addSong(decodedRequest)
-          response <- Ok(s"The song: ${decodedRequest.title} is added")
+          decodedRequest <- req.as[SongRequest]
+          song <- songDatabaseService.addSong(decodedRequest)
+          response <- Ok(song)
         } yield response
       }
-      // TODO: 5. Delete song
-//      case DELETE -> Root / "songs" / songName => {
-//        Ok(songDatabaseService.getAllSongs)
-//      }
+      case req @ DELETE -> Root / "songs" / songUUID => {
+        val uuid = UUID.fromString(songUUID)
+        Ok(songDatabaseService.deleteSong(uuid))
+      }
 
       case GET -> Root / "songs" => {
         for {
           songs <- songDatabaseService.getAllSongs()
           response <- Ok(songs)
         } yield response
-      }
-
-      // TODO: 8. Get a user's fav song
-      case GET -> Root / user / "favourite-song" => {
-//        for {
-//          decodedRequest <- cheese
-//          response <- cheese
-//        } yield cheese
-        Ok()
       }
     }
   }

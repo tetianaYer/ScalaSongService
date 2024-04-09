@@ -2,5 +2,11 @@ package com.clearscore.apitemplate.model
 
 import io.circe.Codec
 
-case class Song(length: Double, title: String, artist: String)
+import java.util.UUID
+
+case class Song(songUuid: UUID, length: Double, title: String, artist: String)
     derives Codec.AsObject
+
+case class SongRequest(
+                        length: Double, title: String, artist: String
+                      )  derives Codec.AsObject
