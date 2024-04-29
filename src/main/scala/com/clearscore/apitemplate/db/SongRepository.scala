@@ -1,20 +1,21 @@
 package com.clearscore.apitemplate.db
 
 import cats.effect.IO
-import com.clearscore.apitemplate.model.{User, Song, SongRequest}
+import com.clearscore.apitemplate.model.{Song, SongRequest, User}
 import cats.MonadThrow
 import cats.effect.kernel.{MonadCancelThrow, Resource}
 import cats.effect.{IO, IOApp}
 import doobie.ExecutionContexts
+import doobie.Fragments
 import doobie.hikari.HikariTransactor
 import doobie.util.transactor.Transactor
 import doobie.implicits.*
-
+import doobie.postgres.implicits._
 import java.util.UUID
 
 class DeletionException(msg: String) extends Exception
 trait SongRepository {
-  def addSong(song: SongRequest): IO[Song]
+  def addSong(song: SongRequest): IO[Int]
   def getAllSongs(): IO[List[Song]]
   def deleteSong(songUUID: UUID): IO[Unit]
 }
@@ -24,22 +25,24 @@ class SongRepositoryImpl extends SongRepository {
 
   val xa: Transactor[IO] = Transactor.fromDriverManager[IO](
     driver = "org.postgresql.Driver", // JDBC connector
-    url = "jdbc:postgresql:demo",
+    url = "jdbc:postgresql:songsdb",
     user = "docker",
     pass = "docker"
   )
-  override def addSong(songRequest: SongRequest): IO[Song] = {
+  override def addSong(songRequest: SongRequest): IO[Int] = {
     val uuid = UUID.randomUUID()
     val song = Song(uuid, songRequest.length, songRequest.title, songRequest.artist)
     val query =
-      sql"INSERT INTO songs (id, title, artist, length) VALUES (${uuid.toString}, ${song.title}, ${song.artist}, ${song.length})"
+      sql"INSERT INTO songs (id, length, title, artist) VALUES ($uuid, ${song.length}, ${song.title}, ${song.artist})"
     val action = query.update.run
     action.transact(xa)
   }
 
-  override def getAllSongs(): IO[List[Song]] = IO {
-    StarterFakeDB.songsTable.toList
+  override def getAllSongs(): IO[List[Song]] = {
+    sql"SELECT * FROM songs".query[Song].to[List].transact(xa)
   }
+
+
 
   override def deleteSong(songUUID: UUID): IO[Unit] = IO {
     for {
