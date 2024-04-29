@@ -6,6 +6,8 @@ val Http4sVersion = "0.23.25"
 val CirceVersion = "0.14.6"
 val LogbackVersion = "1.4.14"
 val Sttp4Version = "4.0.0-M8"
+lazy val doobieVersion = "1.0.0-RC1"
+
 
 resolvers += "jitpack".at("https://jitpack.io")
 
@@ -29,6 +31,10 @@ lazy val root = (project in file("."))
       "io.circe" %% "circe-literal" % CirceVersion,
       "io.monix" %% "newtypes-core" % "0.2.3",
       "io.monix" %% "newtypes-circe-v0-14" % "0.2.3",
+      "org.tpolecat" %% "doobie-core" % doobieVersion,
+      "org.tpolecat" %% "doobie-hikari" % doobieVersion,
+      "org.tpolecat" %% "doobie-postgres" % doobieVersion,
+      "org.tpolecat" %% "doobie-scalatest" % doobieVersion % Test,
       "org.scalactic" %% "scalactic" % "3.2.16",
       "org.scalatest" %% "scalatest" % "3.2.16" % Test,
       "org.typelevel" %% "discipline-scalatest" % "2.2.0",

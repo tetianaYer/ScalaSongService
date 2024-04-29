@@ -27,6 +27,7 @@ class SongDatabaseRoutes(
           response <- Ok(song)
         } yield response
       }
+      // DELETE song
       case req @ DELETE -> Root / "songs" / songUUID => {
         val uuid = UUID.fromString(songUUID)
         Ok(songDatabaseService.deleteSong(uuid))

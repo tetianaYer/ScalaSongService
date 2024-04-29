@@ -2,6 +2,13 @@ package com.clearscore.apitemplate.db
 
 import cats.effect.IO
 import com.clearscore.apitemplate.model.{User, Song, SongRequest}
+import cats.MonadThrow
+import cats.effect.kernel.{MonadCancelThrow, Resource}
+import cats.effect.{IO, IOApp}
+import doobie.ExecutionContexts
+import doobie.hikari.HikariTransactor
+import doobie.util.transactor.Transactor
+import doobie.implicits.*
 
 import java.util.UUID
 
@@ -14,13 +21,20 @@ trait SongRepository {
 
 class SongRepositoryImpl extends SongRepository {
   // Wrapping the entire operation in an IO monad to simulate a database connection :)
-  override def addSong(song: SongRequest): IO[Song] = {
-    for {
-      currentSongs <- IO(StarterFakeDB.songsTable)
-      uuid = UUID.randomUUID()
-      newSong = Song(uuid, song.length, song.title, song.artist)
-      _ <- IO(StarterFakeDB.addNewSong(newSong).toList)
-    } yield newSong
+
+  val xa: Transactor[IO] = Transactor.fromDriverManager[IO](
+    driver = "org.postgresql.Driver", // JDBC connector
+    url = "jdbc:postgresql:demo",
+    user = "docker",
+    pass = "docker"
+  )
+  override def addSong(songRequest: SongRequest): IO[Song] = {
+    val uuid = UUID.randomUUID()
+    val song = Song(uuid, songRequest.length, songRequest.title, songRequest.artist)
+    val query =
+      sql"INSERT INTO songs (id, title, artist, length) VALUES (${uuid.toString}, ${song.title}, ${song.artist}, ${song.length})"
+    val action = query.update.run
+    action.transact(xa)
   }
 
   override def getAllSongs(): IO[List[Song]] = IO {
