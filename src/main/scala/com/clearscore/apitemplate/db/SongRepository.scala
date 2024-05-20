@@ -15,7 +15,7 @@ import java.util.UUID
 
 class DeletionException(msg: String) extends Exception
 trait SongRepository {
-  def addSong(song: SongRequest): IO[Int]
+  def addSong(song: SongRequest): IO[UUID]
   def getAllSongs(): IO[List[Song]]
   def deleteSong(songUUID: UUID): IO[Unit]
 }
@@ -29,13 +29,14 @@ class SongRepositoryImpl extends SongRepository {
     user = "docker",
     pass = "docker"
   )
-  override def addSong(songRequest: SongRequest): IO[Int] = {
+  override def addSong(songRequest: SongRequest): IO[UUID] = {
     val uuid = UUID.randomUUID()
     val song = Song(uuid, songRequest.length, songRequest.title, songRequest.artist)
     val query =
       sql"INSERT INTO songs (id, length, title, artist) VALUES ($uuid, ${song.length}, ${song.title}, ${song.artist})"
     val action = query.update.run
-    action.transact(xa)
+    action.transact(xa).map(_ => uuid)
+
   }
 
   override def getAllSongs(): IO[List[Song]] = {
