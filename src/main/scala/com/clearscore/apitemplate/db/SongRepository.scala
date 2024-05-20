@@ -1,23 +1,18 @@
 package com.clearscore.apitemplate.db
 
 import cats.effect.IO
-import com.clearscore.apitemplate.model.{Song, SongRequest, User}
-import cats.MonadThrow
-import cats.effect.kernel.{MonadCancelThrow, Resource}
-import cats.effect.{IO, IOApp}
-import doobie.ExecutionContexts
-import doobie.Fragments
-import doobie.hikari.HikariTransactor
-import doobie.util.transactor.Transactor
+import com.clearscore.apitemplate.model.{Song, SongRequest}
 import doobie.implicits.*
-import doobie.postgres.implicits._
+import doobie.postgres.implicits.*
+import doobie.util.transactor.Transactor
+
 import java.util.UUID
 
 class DeletionException(msg: String) extends Exception
 trait SongRepository {
   def addSong(song: SongRequest): IO[UUID]
   def getAllSongs(): IO[List[Song]]
-  def deleteSong(songUUID: UUID): IO[Unit]
+  def deleteSong(songUUID: UUID): IO[Int]
 }
 
 class SongRepositoryImpl extends SongRepository {
@@ -36,32 +31,16 @@ class SongRepositoryImpl extends SongRepository {
       sql"INSERT INTO songs (id, length, title, artist) VALUES ($uuid, ${song.length}, ${song.title}, ${song.artist})"
     val action = query.update.run
     action.transact(xa).map(_ => uuid)
-
   }
 
   override def getAllSongs(): IO[List[Song]] = {
     sql"SELECT * FROM songs".query[Song].to[List].transact(xa)
   }
 
-
-
-  override def deleteSong(songUUID: UUID): IO[Unit] = IO {
-    for {
-      _ <- IO.println("Initiated deleting of song in db: " + songUUID)
-      index = StarterFakeDB.songsTable.indexWhere(
-        _.songUuid == songUUID
-      )
-      deletedSong <- IO(
-        if index == -1 then throw new DeletionException("Not found!!!!!")
-        else {
-          val deleted: Song = StarterFakeDB.songsTable.remove(index)
-          Some(deleted)
-        }
-      )
-      _ <- IO.println("Deleted song in db: " + deletedSong)
-      _ <- IO.println("Index: " + index)
-      _ <- IO.println(StarterFakeDB.usersTable.toList)
-
-    } yield ()
+  override def deleteSong(songUUID: UUID): IO[Int] = {
+    val query =
+      sql"DELETE FROM songs WHERE id = $songUUID"
+    val action = query.update.run
+    action.transact(xa)
   }
 }
