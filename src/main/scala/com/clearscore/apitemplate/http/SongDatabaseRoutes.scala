@@ -4,7 +4,10 @@ import cats.effect.IO
 import com.clearscore.apitemplate.model.SongRequest
 import com.clearscore.apitemplate.service.{SongDatabaseService, UserService}
 import org.http4s.*
-import org.http4s.circe.CirceEntityCodec.{circeEntityDecoder, circeEntityEncoder}
+import org.http4s.circe.CirceEntityCodec.{
+  circeEntityDecoder,
+  circeEntityEncoder
+}
 import org.http4s.dsl.Http4sDsl
 
 import java.util.UUID
@@ -24,7 +27,7 @@ class SongDatabaseRoutes(
         for {
           decodedRequest <- req.as[SongRequest]
           song <- songDatabaseService.addSong(decodedRequest)
-          response <- Ok(song)
+          response <- Created(s"Song added with uuid: $song")
         } yield response
       }
       // DELETE song

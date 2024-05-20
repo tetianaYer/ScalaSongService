@@ -2,7 +2,7 @@ package com.clearscore.apitemplate.db
 
 import cats.effect.IO
 import cats.syntax.all.*
-import com.clearscore.apitemplate.model.{User, Song, UserRequest}
+import com.clearscore.apitemplate.model.{Song, User, UserRequest}
 
 import java.util.UUID
 
@@ -25,7 +25,7 @@ object UserRepository {
       for {
         currentUsers <- IO(StarterFakeDB.usersTable)
         uuid = UUID.randomUUID()
-        newUser = User(uuid, user.userName, user.age, user.favouriteSong)
+        newUser = User(uuid, user.userName, user.age, user.favouriteSongUuid)
         _ <- IO(StarterFakeDB.addNewUser(newUser).toList)
       } yield newUser
     }
@@ -55,18 +55,14 @@ object UserRepository {
       } yield deletedUser
     }
     override def addFaveSong(userUuid: UUID, songUuid: UUID): IO[Unit] = IO {
-      // 1. get the song
-      val songIndex = StarterFakeDB.songsTable.indexWhere(_.songUuid === songUuid)
-      val song: Song = StarterFakeDB.songsTable(songIndex)
-
       // 2. Get the User
       val userIndex = StarterFakeDB.usersTable.indexWhere(_.userUuid === userUuid)
       val user: User = StarterFakeDB.usersTable.remove(userIndex)
-      val newUser = user.copy(favouriteSong = song.some)
+      val newUser = user.copy(favouriteSongUuid = songUuid.some)
       // 3. Set users fave song to song
       StarterFakeDB.usersTable.addOne(newUser)
-
     }
+
 
   }
 
