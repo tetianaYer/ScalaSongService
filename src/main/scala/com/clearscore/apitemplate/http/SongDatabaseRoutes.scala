@@ -9,6 +9,7 @@ import org.http4s.circe.CirceEntityCodec.{
   circeEntityEncoder
 }
 import org.http4s.dsl.Http4sDsl
+import org.http4s.dsl.*
 
 import java.util.UUID
 /*
@@ -31,10 +32,11 @@ class SongDatabaseRoutes(
         } yield response
       }
       // DELETE song
-      case req @ DELETE -> Root / "songs" / songUUID => {
-        val uuid = UUID.fromString(songUUID)
-        Ok(songDatabaseService.deleteSong(uuid))
-      }
+      case DELETE -> Root / "songs" / UUIDVar(songUUID) =>
+        songDatabaseService.deleteSong(songUUID)
+            .map(_ => Ok(s"Song deleted"))
+            .handleError(_ => NotFound())
+            .flatten
 
       case GET -> Root / "songs" => {
         for {

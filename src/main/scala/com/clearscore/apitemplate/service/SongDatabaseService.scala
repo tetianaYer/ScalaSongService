@@ -10,7 +10,7 @@ trait SongDatabaseService {
   def addSong(song: SongRequest): IO[UUID]
 //  def deleteSong(song: Song): IO[Option[Song]]
   def getAllSongs(): IO[List[Song]]
-  def deleteSong(uuid: UUID): IO[Unit]
+  def deleteSong(uuid: UUID): IO[Int]
 }
 
 class SongDatabaseServiceImpl(
@@ -21,13 +21,12 @@ class SongDatabaseServiceImpl(
   override def addSong(song: SongRequest): IO[UUID] = {
     songRepository.addSong(song)
   }
-  override def deleteSong(songUUID: UUID): IO[Unit] = {
-  // This logic should be handled in this service, making multiple calls to the repo if necessary
-  // e.g.
+  override def deleteSong(songUUID: UUID): IO[Int] = {
+  // We need to throw an error if the song doesnt exist
     songRepository.deleteSong(songUUID)
   }
 
   override def getAllSongs(): IO[List[Song]] =
     songRepository.getAllSongs()
 }
-// TODO: add a get song by ID. 
+// TODO: add a get song by ID.
