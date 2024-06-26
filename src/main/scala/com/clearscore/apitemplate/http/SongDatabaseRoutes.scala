@@ -4,10 +4,7 @@ import cats.effect.IO
 import com.clearscore.apitemplate.model.SongRequest
 import com.clearscore.apitemplate.service.{SongDatabaseService, UserService}
 import org.http4s.*
-import org.http4s.circe.CirceEntityCodec.{
-  circeEntityDecoder,
-  circeEntityEncoder
-}
+import org.http4s.circe.CirceEntityCodec.{circeEntityDecoder, circeEntityEncoder}
 import org.http4s.dsl.Http4sDsl
 import org.http4s.dsl.*
 
@@ -43,6 +40,14 @@ class SongDatabaseRoutes(
           songs <- songDatabaseService.getAllSongs()
           response <- Ok(songs)
         } yield response
+      }
+
+      case GET -> Root / "songs" / UUIDVar(songUUID)   => {
+        songDatabaseService.getSongById(songUUID)
+          .flatMap {
+            case Some(song) => Ok(song)
+            case None => NotFound()
+          }
       }
     }
   }

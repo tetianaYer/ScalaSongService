@@ -11,6 +11,7 @@ trait SongDatabaseService {
 //  def deleteSong(song: Song): IO[Option[Song]]
   def getAllSongs(): IO[List[Song]]
   def deleteSong(uuid: UUID): IO[Int]
+  def getSongById(UUID: UUID): IO[Option[Song]]
 }
 
 class SongDatabaseServiceImpl(
@@ -28,5 +29,9 @@ class SongDatabaseServiceImpl(
 
   override def getAllSongs(): IO[List[Song]] =
     songRepository.getAllSongs()
+
+  override def getSongById(songUUID: UUID): IO[Option[Song]] = {
+    // We need to throw an error if the song doesnt exist
+    songRepository.getById(songUUID)
+  }
 }
-// TODO: add a get song by ID.

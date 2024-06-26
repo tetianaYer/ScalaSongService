@@ -13,6 +13,7 @@ trait SongRepository {
   def addSong(song: SongRequest): IO[UUID]
   def getAllSongs(): IO[List[Song]]
   def deleteSong(songUUID: UUID): IO[Int]
+  def getById(songUUID: UUID): IO[Option[Song]]
 }
 
 class SongRepositoryImpl extends SongRepository {
@@ -43,4 +44,8 @@ class SongRepositoryImpl extends SongRepository {
     val action = query.update.run
     action.transact(xa)
   }
+
+    override def getById(songUUID: UUID): IO[Option[Song]] = {
+      sql"SELECT * FROM songs WHERE id = $songUUID".query[Song].option.transact(xa)
+    }
 }
