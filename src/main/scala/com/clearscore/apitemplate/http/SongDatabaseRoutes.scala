@@ -7,8 +7,12 @@ import org.http4s.*
 import org.http4s.circe.CirceEntityCodec.{circeEntityDecoder, circeEntityEncoder}
 import org.http4s.dsl.Http4sDsl
 import org.http4s.dsl.*
+import org.http4s.server.middleware.CORSConfig
+import org.http4s.server.middleware.CORS
 
 import java.util.UUID
+import scala.concurrent.duration.*
+
 /*
  TODO:
    6. Update songs
@@ -18,8 +22,13 @@ class SongDatabaseRoutes(
     songDatabaseService: SongDatabaseService,
     userService: UserService
 ) extends Http4sDsl[IO] {
-  def routes: HttpRoutes[IO] = {
-    HttpRoutes.of[IO] {
+  private val corsPolicy = CORS.policy
+    .withAllowOriginAll
+    .withAllowMethodsIn(Set(Method.GET, Method.POST, Method.DELETE))
+    .withMaxAge(1.day)
+
+  def routes: HttpRoutes[IO] =  {
+    corsPolicy(HttpRoutes.of[IO] {
       // Add a song
       case req @ POST -> Root / "songs" => {
         for {
@@ -50,5 +59,6 @@ class SongDatabaseRoutes(
           }
       }
     }
+    )
   }
 }
