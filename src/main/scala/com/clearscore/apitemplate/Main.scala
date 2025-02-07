@@ -8,6 +8,7 @@ import org.http4s.*
 import org.http4s.implicits.*
 import org.http4s.jetty.server.JettyBuilder
 import org.http4s.server.Router
+import org.http4s.server.middleware.CORS
 
 object Main extends IOApp {
   IO.println("Server Starting")
@@ -25,7 +26,9 @@ object Main extends IOApp {
       "/v1" -> songDatabaseRoutes.routes,
       "/v1" -> userRoutes.routes()
     )
-    buildServer(apis) as (ExitCode.Success)
+    val corsPolicy = CORS.policy.withAllowOriginAll
+    val corsApis = corsPolicy(apis)
+    buildServer(corsApis) as (ExitCode.Success)
   }
 
   private def buildServer(app: HttpRoutes[IO]) =

@@ -6,10 +6,7 @@ import com.clearscore.apitemplate.service.UserService
 import org.http4s.*
 import org.http4s.circe.CirceEntityCodec.*
 import org.http4s.dsl.Http4sDsl
-import org.http4s.dsl.impl.{
-  OptionalValidatingQueryParamDecoderMatcher,
-  QueryParamDecoderMatcher
-}
+import org.http4s.dsl.impl.QueryParamDecoderMatcher
 
 import java.util.UUID
 
@@ -21,22 +18,22 @@ object UserQueryParamMatcher
 class UserRoutes(userService: UserService) extends Http4sDsl[IO] {
   def routes(): HttpRoutes[IO] = {
     HttpRoutes.of[IO] {
-      case GET -> Root / "users" => {
+      case GET -> Root / "users" =>
         for {
           _ <- IO.println(s"getting users")
           users <- userService.getUsers()
           response <- Ok(users)
         } yield response
-      }
 
-      case req @ POST -> Root / "user" => {
+
+      case req @ POST -> Root / "user" =>
         for {
           decodedRequest <- req.as[UserRequest]
           _ <- IO.println(s"adding user: $decodedRequest")
           response <- Created(userService.addUser(decodedRequest))
         } yield response
-      }
-      case DELETE -> Root / "user" / user => {
+
+      case DELETE -> Root / "user" / user =>
         for {
           _ <- IO.println(s"deleting user: $user")
           deletedUser <- userService.deleteUser(user)
@@ -46,11 +43,11 @@ class UserRoutes(userService: UserService) extends Http4sDsl[IO] {
               NotFound(s"Error: no user $user")
           }
         } yield response
-      }
+
       // TODO: 7  Add user's fav song
       case POST -> Root / "users" / "add-favourite-song" :? UserQueryParamMatcher(
             userUuid
-          ) +& SongQueryParamMatcher(songUuid) => {
+          ) +& SongQueryParamMatcher(songUuid) =>
         for {
           _ <- userService.addFaveSong(
             UUID.fromString(userUuid),
@@ -58,15 +55,15 @@ class UserRoutes(userService: UserService) extends Http4sDsl[IO] {
           )
           response <- Ok(s"The song: $songUuid is now your favourite song!")
         } yield response
-      }
+
       // TODO: 8 Get a user's fav song
-      case GET -> Root / "users" / userUuid / "favourite-songs" => {
+      case GET -> Root / "users" / userUuid / "favourite-songs" =>
         //        for {
         //          decodedRequest <- cheese
         //          response <- cheese
         //        } yield cheese
         Ok()
-      }
+
     }
   }
 }
