@@ -1,4 +1,4 @@
-package com.clearscore.apitemplate.model
+package com.example.apitemplate.model
 
 import io.circe.Codec
 

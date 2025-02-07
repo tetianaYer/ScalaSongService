@@ -1,9 +1,9 @@
-package com.clearscore.apitemplate
+package com.example.apitemplate
 
 import cats.effect.*
-import com.clearscore.apitemplate.db.*
-import com.clearscore.apitemplate.http.*
-import com.clearscore.apitemplate.service.{SongDatabaseServiceImpl, UserService}
+import com.example.apitemplate.db.*
+import com.example.apitemplate.http.*
+import com.example.apitemplate.service.{SongDatabaseServiceImpl, UserService}
 import org.http4s.*
 import org.http4s.implicits.*
 import org.http4s.jetty.server.JettyBuilder

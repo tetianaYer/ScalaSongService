@@ -1,8 +1,8 @@
-package com.clearscore.apitemplate.http
+package com.example.apitemplate.http
 
 import cats.effect.IO
-import com.clearscore.apitemplate.model.SongRequest
-import com.clearscore.apitemplate.service.{SongDatabaseService, UserService}
+import com.example.apitemplate.model.SongRequest
+import com.example.apitemplate.service.{SongDatabaseService, UserService}
 import org.http4s.*
 import org.http4s.circe.CirceEntityCodec.{circeEntityDecoder, circeEntityEncoder}
 import org.http4s.dsl.Http4sDsl

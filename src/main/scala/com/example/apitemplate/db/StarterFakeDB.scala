@@ -1,7 +1,6 @@
-package com.clearscore.apitemplate.db
+package com.example.apitemplate.db
 
-import com.clearscore.apitemplate.model.*
-import java.util.UUID
+import com.example.apitemplate.model.*
 
 import scala.collection.mutable.ListBuffer
 

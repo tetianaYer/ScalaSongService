@@ -13,7 +13,7 @@ resolvers += "jitpack".at("https://jitpack.io")
 
 lazy val root = (project in file("."))
   .settings(
-    name := "ScalaSongDatabase",
+    name := "ScalaSongService",
     libraryDependencies += compilerPlugin(
       "org.polyvariant" % "better-tostring" % "0.3.17" cross CrossVersion.full
     ),

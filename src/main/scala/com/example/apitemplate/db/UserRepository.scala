@@ -1,8 +1,8 @@
-package com.clearscore.apitemplate.db
+package com.example.apitemplate.db
 
 import cats.effect.IO
 import cats.syntax.all.*
-import com.clearscore.apitemplate.model.{Song, User, UserRequest}
+import com.example.apitemplate.model.{Song, User, UserRequest}
 
 import java.util.UUID
 

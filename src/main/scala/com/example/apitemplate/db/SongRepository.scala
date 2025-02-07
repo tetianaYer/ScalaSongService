@@ -1,7 +1,7 @@
-package com.clearscore.apitemplate.db
+package com.example.apitemplate.db
 
 import cats.effect.IO
-import com.clearscore.apitemplate.model.{Song, SongRequest}
+import com.example.apitemplate.model.{Song, SongRequest}
 import doobie.implicits.*
 import doobie.postgres.implicits.*
 import doobie.util.transactor.Transactor

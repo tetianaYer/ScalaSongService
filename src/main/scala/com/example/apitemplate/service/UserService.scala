@@ -1,8 +1,8 @@
-package com.clearscore.apitemplate.service
+package com.example.apitemplate.service
 
 import cats.effect.IO
-import com.clearscore.apitemplate.db.UserRepository
-import com.clearscore.apitemplate.model.{User, UserRequest}
+import com.example.apitemplate.db.UserRepository
+import com.example.apitemplate.model.{User, UserRequest}
 
 import java.util.UUID
 
