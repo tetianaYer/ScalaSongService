@@ -33,7 +33,7 @@ object Main extends IOApp {
 
   private def buildServer(app: HttpRoutes[IO]) =
     JettyBuilder[IO]
-      .bindHttp(8081, "localhost")
+      .bindHttp(8080, "localhost")
       .mountHttpApp(app.orNotFound, "/")
       .serve
       .compile
