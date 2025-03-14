@@ -30,7 +30,8 @@ class UserRoutes(userService: UserService) extends Http4sDsl[IO] {
         for {
           decodedRequest <- req.as[UserRequest]
           _ <- IO.println(s"adding user: $decodedRequest")
-          response <- Created(userService.addUser(decodedRequest))
+          user <- userService.addUser(decodedRequest)
+          response <- Created(user)
         } yield response
 
       case DELETE -> Root / "user" / user =>

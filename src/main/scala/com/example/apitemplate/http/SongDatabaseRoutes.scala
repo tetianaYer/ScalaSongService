@@ -34,11 +34,11 @@ class SongDatabaseRoutes(
         for {
           decodedRequest <- req.as[SongRequest]
           song <- songDatabaseService.addSong(decodedRequest)
-          response <- Created(s"Song added with uuid: $song")
+          response <- Created(song)
         } yield response
       }
       // DELETE song
-      case DELETE -> Root / "songs" / UUIDVar(songUUID) =>
+      case PUT -> Root / "songs" / UUIDVar(songUUID) =>
         songDatabaseService.deleteSong(songUUID)
             .map(_ => Ok(s"Song deleted"))
             .handleError(_ => NotFound())
