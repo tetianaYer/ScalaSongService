@@ -3,7 +3,7 @@ package com.example.apitemplate
 import cats.effect.*
 import com.example.apitemplate.db.*
 import com.example.apitemplate.http.*
-import com.example.apitemplate.service.{SongDatabaseServiceImpl, UserService}
+import com.example.apitemplate.service.{SongDatabaseServiceImpl, UserService, UserServiceImpl}
 import org.http4s.*
 import org.http4s.implicits.*
 import org.http4s.jetty.server.JettyBuilder
@@ -14,11 +14,11 @@ object Main extends IOApp {
   IO.println("Server Starting")
   private val songRepository = SongRepositoryImpl()
   private val songDatabaseService = SongDatabaseServiceImpl(songRepository)
-  private val userRepository = UserRepository()
-  private val userService = UserService(userRepository)
+  private val userRepository = UserRepositoryImpl(songRepository)
+  private val userService = UserServiceImpl(userRepository, songRepository)
   private val songDatabaseRoutes =
     new SongDatabaseRoutes(songDatabaseService, userService)
-  private val userRoutes = new UserRoutes(userService)
+  private val userRoutes = new UserRoutes(userService, songDatabaseService)
 
   override def run(args: List[String]): IO[ExitCode] = {
 

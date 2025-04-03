@@ -2,7 +2,7 @@ package com.example.apitemplate.http
 
 import com.example.apitemplate.model.UserRequest
 import cats.effect.IO
-import com.example.apitemplate.service.UserService
+import com.example.apitemplate.service.{SongDatabaseService, UserService}
 import org.http4s.*
 import org.http4s.circe.CirceEntityCodec.*
 import org.http4s.dsl.Http4sDsl
@@ -15,13 +15,15 @@ object SongQueryParamMatcher
 object UserQueryParamMatcher
     extends QueryParamDecoderMatcher[String]("userUuid")
 
-class UserRoutes(userService: UserService) extends Http4sDsl[IO] {
+class UserRoutes(userService: UserService,
+                 songDatabaseService: SongDatabaseService,
+                ) extends Http4sDsl[IO] {
   def routes(): HttpRoutes[IO] = {
     HttpRoutes.of[IO] {
       case GET -> Root / "users" =>
         for {
           _ <- IO.println(s"getting users")
-          users <- userService.getUsers()
+          users <- userService.getUsers
           response <- Ok(users)
         } yield response
 
@@ -34,28 +36,25 @@ class UserRoutes(userService: UserService) extends Http4sDsl[IO] {
           response <- Created(user)
         } yield response
 
-      case DELETE -> Root / "user" / user =>
-        for {
-          _ <- IO.println(s"deleting user: $user")
-          deletedUser <- userService.deleteUser(user)
-          response <- deletedUser match {
-            case Some(deletedUser) => Ok(deletedUser)
-            case None =>
-              NotFound(s"Error: no user $user")
-          }
-        } yield response
+      case PUT -> Root / "user" / UUIDVar(userUuid) =>
+          userService.deleteUser(userUuid).map(
+            user => Ok(s"User deleted ${user.map(_.userName)}")
+          ).handleError(
+            _ => NotFound(s"Error: no user $userUuid")
+          ).flatten
 
       // TODO: 7  Add user's fav song
       case POST -> Root / "users" / "add-favourite-song" :? UserQueryParamMatcher(
             userUuid
           ) +& SongQueryParamMatcher(songUuid) =>
-        for {
-          _ <- userService.addFaveSong(
+          userService.addFaveSong(
             UUID.fromString(userUuid),
             UUID.fromString(songUuid)
-          )
-          response <- Ok(s"The song: $songUuid is now your favourite song!")
-        } yield response
+          ).map(
+            updatedUser => Ok(s"The song ${updatedUser.map(_.favouriteSongUuid)} is now your favourite song!")
+          ).handleError(
+            _ => NotFound(s"Error: no user $userUuid or song $songUuid can be found")
+          ).flatten
 
       // TODO: 8 Get a user's fav song
       case GET -> Root / "users" / userUuid / "favourite-songs" =>
