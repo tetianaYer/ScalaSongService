@@ -1,39 +1,39 @@
 package com.example.apitemplate.service
 
 import cats.effect.IO
-import com.example.apitemplate.db.UserRepository
+import com.example.apitemplate.db.{SongRepository, UserRepository}
 import com.example.apitemplate.model.{User, UserRequest}
+import doobie.util.transactor.Transactor
+import doobie.postgres.implicits.*
+import doobie.implicits.*
 
 import java.util.UUID
 
 trait UserService {
-//  def getProjectInformation(): IO[Option[ProjectInformation]]
   def addUser(user: UserRequest): IO[User]
 
-  def getUsers(): IO[List[User]]
-  def deleteUser(user: String): IO[Option[User]]
-  def addFaveSong(userUuid: UUID, songUuid: UUID): IO[Unit]
-}
-
-object UserService {
-  def apply(userRepository: UserRepository) = new UserServiceImpl(userRepository: UserRepository)
+  def getUsers: IO[List[User]]
+  def deleteUser(userUuid: UUID): IO[Option[User]]
+  def addFaveSong(userUuid: UUID, songUuid: UUID): IO[Option[User]]
 }
 
 class UserServiceImpl(
-                       userRepository: UserRepository
+                       userRepository: UserRepository,
+                       songRepository: SongRepository
+
 ) extends UserService {
 
-  override def getUsers(): IO[List[User]] = userRepository.getUsers()
+  override def getUsers: IO[List[User]] = userRepository.getUsers
   override def addUser(user: UserRequest): IO[User] = {
     userRepository.addUser(user)
 
   }
 
-  override def deleteUser(user: String): IO[Option[User]] = {
-    userRepository.deleteUser(user)
+  override def deleteUser(userUuid: UUID): IO[Option[User]] = {
+    userRepository.deleteUser(userUuid)
   }
 
-  override def addFaveSong(userUuid: UUID, songUuid: UUID): IO[Unit] = {
+  override def addFaveSong(userUuid: UUID, songUuid: UUID): IO[Option[User]] = {
     userRepository.addFaveSong(userUuid, songUuid)
   }
 }

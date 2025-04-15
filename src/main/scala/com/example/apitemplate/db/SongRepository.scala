@@ -11,7 +11,7 @@ import java.util.UUID
 class DeletionException(msg: String) extends Exception
 trait SongRepository {
   def addSong(song: SongRequest): IO[Song]
-  def getAllSongs(): IO[List[Song]]
+  def getAllSongs: IO[List[Song]]
   def deleteSong(songUUID: UUID): IO[Int]
   def getById(songUUID: UUID): IO[Option[Song]]
 }
@@ -34,7 +34,7 @@ class SongRepositoryImpl extends SongRepository {
     action.transact(xa).map(_ => song)
   }
 
-  override def getAllSongs(): IO[List[Song]] = {
+  override def getAllSongs: IO[List[Song]] = {
     sql"SELECT * FROM songs".query[Song].to[List].transact(xa)
   }
 

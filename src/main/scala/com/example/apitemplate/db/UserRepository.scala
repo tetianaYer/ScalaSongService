@@ -3,67 +3,61 @@ package com.example.apitemplate.db
 import cats.effect.IO
 import cats.syntax.all.*
 import com.example.apitemplate.model.{Song, User, UserRequest}
+import doobie.implicits.*
+import doobie.postgres.implicits.*
+import doobie.util.transactor.Transactor
 
 import java.util.UUID
 
 trait UserRepository {
-  def getUsers(): IO[List[User]]
+  def getUsers: IO[List[User]]
   def addUser(user: UserRequest): IO[User]
-  def deleteUser(name: String): IO[Option[User]]
-  def addFaveSong(userUuid: UUID, songUuid: UUID): IO[Unit]
-
-  def allUsers(): IO[Unit]
+  def deleteUser(userUuid: UUID): IO[Option[User]]
+  def addFaveSong(userUuid: UUID, songUuid: UUID): IO[Option[User]]
 }
 
-object UserRepository {
-  def apply(): UserRepository = new StarterRepositoryImpl()
-  private class StarterRepositoryImpl() extends UserRepository {
-    override def getUsers(): IO[List[User]] =
-      IO(StarterFakeDB.usersTable.toList)
+class UserRepositoryImpl(songRepository: SongRepository) extends UserRepository {
+
+    val xa: Transactor[IO] = Transactor.fromDriverManager[IO](
+      driver = "org.postgresql.Driver", // JDBC connector
+      url = "jdbc:postgresql:songsdb",
+      user = "docker",
+      pass = "docker"
+    )
+
+    override def getUsers: IO[List[User]] = {
+      sql"SELECT * FROM users".query[User].to[List].transact(xa)
+    }
 
     override def addUser(user: UserRequest): IO[User] = {
-      for {
-        currentUsers <- IO(StarterFakeDB.usersTable)
-        uuid = UUID.randomUUID()
-        newUser = User(uuid, user.userName, user.age, user.favouriteSongUuid)
-        _ <- IO(StarterFakeDB.addNewUser(newUser).toList)
-      } yield newUser
+      val uuid = UUID.randomUUID()
+      val newUser = User(uuid, user.userName, user.age, user.favouriteSongUuid)
+      val query =
+        sql"INSERT INTO users (id, name, age, song_id) VALUES ($uuid, ${user.userName}, ${user.age}, ${user.favouriteSongUuid})"
+      val action = query.update.run
+      action.transact(xa).map(_ => newUser)
     }
 
-    override def allUsers(): IO[Unit] = {
-      IO(StarterFakeDB.usersTable.toList)
+    def getUserByUuid(userUuid: UUID): IO[Option[User]] = {
+      sql"SELECT * FROM users WHERE id = $userUuid".query[User].option.transact(xa)
     }
+
     override def deleteUser(
-        name: String
+        userUuid: UUID
     ): IO[Option[User]] = {
-      for {
-        _ <- IO.println("Initiated deleting of user in db: " + name)
-        index = StarterFakeDB.usersTable.indexWhere(
-          _.userName == name
-        )
-        deletedUser <- IO(
-          if index == -1 then None
-          else {
-            val deleted: User = StarterFakeDB.usersTable.remove(index)
-            Some(deleted)
-          }
-        )
-        _ <- IO.println("Deleted user in db: " + deletedUser)
-        _ <- IO.println("Index: " + index)
-        _ <- IO.println(StarterFakeDB.usersTable.toList)
-
-      } yield deletedUser
+        sql"DELETE FROM users WHERE id = $userUuid RETURNING *".query[User].option.transact(xa)
     }
-    override def addFaveSong(userUuid: UUID, songUuid: UUID): IO[Unit] = IO {
-      // 2. Get the User
-      val userIndex = StarterFakeDB.usersTable.indexWhere(_.userUuid === userUuid)
-      val user: User = StarterFakeDB.usersTable.remove(userIndex)
-      val newUser = user.copy(favouriteSongUuid = songUuid.some)
+    override def addFaveSong(userUuid: UUID, songUuid: UUID): IO[Option[User]] = {
+      // 1. Get the User
+      val userId = getUserByUuid(userUuid).map(_.getOrElse(throw new Exception("User not found")))
+//      println(s"User: $userId")
+      // 2. Get the song
+      val songId = songRepository.getById(songUuid).map(_.getOrElse(throw new Exception("Song not found")))
+//      println(s"Song: $songId")
       // 3. Set users fave song to song
-      StarterFakeDB.usersTable.addOne(newUser)
+      sql"UPDATE users SET song_id = $songUuid WHERE id = $userUuid RETURNING *".query[User].option.transact(xa)
     }
 
 
   }
 
-}

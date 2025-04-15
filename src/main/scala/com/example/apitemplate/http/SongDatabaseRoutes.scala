@@ -46,7 +46,7 @@ class SongDatabaseRoutes(
 
       case GET -> Root / "songs" => {
         for {
-          songs <- songDatabaseService.getAllSongs()
+          songs <- songDatabaseService.getAllSongs
           response <- Ok(songs)
         } yield response
       }
