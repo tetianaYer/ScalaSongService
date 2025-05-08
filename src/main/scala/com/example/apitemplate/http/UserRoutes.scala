@@ -43,6 +43,13 @@ class UserRoutes(userService: UserService,
             _ => NotFound(s"Error: no user $userUuid")
           ).flatten
 
+      case GET -> Root / "user" / UUIDVar(userUuid) =>
+          userService.deleteUser(userUuid).map(
+            user => Ok(user)
+          ).handleError(
+            _ => NotFound(s"Error: no user found with: $userUuid")
+          ).flatten
+
       // TODO: 7  Add user's fav song
       case POST -> Root / "users" / "add-favourite-song" :? UserQueryParamMatcher(
             userUuid
