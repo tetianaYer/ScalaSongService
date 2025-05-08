@@ -12,6 +12,7 @@ import java.util.UUID
 trait UserRepository {
   def getUsers: IO[List[User]]
   def addUser(user: UserRequest): IO[User]
+  def getUserByUuid(userUuid: UUID): IO[Option[User]]
   def deleteUser(userUuid: UUID): IO[Option[User]]
   def addFaveSong(userUuid: UUID, songUuid: UUID): IO[Option[User]]
 }
